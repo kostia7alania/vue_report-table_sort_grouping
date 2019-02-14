@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0">
   <link rel="icon" href="<%= BASE_URL %>favicon.ico">
   <!--<link rel="icon" href="https://apcis.tmou.org/img/tmou.gif" >-->
-  <title>Report: Ship Watch List</title>
+  <title>Report: Watch List</title>
 </head>
 
 <body>
@@ -18,16 +18,17 @@
   <div id="app"></div>
   <!-- built files will be auto injected -->
   <script>
-    let a = setInterval( e => {
+    
+   let a = setInterval( e => {
       initVue({
-        api_url: "./public_det/swl_sup/api.php?",
-        title: 'Ships Report',
+        api_url: "/swl_sup/api.php?",
+        title: 'Report',
         title2: ' ',
         assets_path: '../assets/'
       });
       clearInterval(a);
     }, 222);
-
+ 
   </script> 
 </body>
 
