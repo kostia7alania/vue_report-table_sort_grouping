@@ -3,25 +3,36 @@
     <div class="row">
       <div class="col">
         <label for="sel1">
-          <b>From Year: {{year}}</b>
+          <b>From Year:
+            <animated-number :value="year" :formatValue="e=>+e.toFixed(0)" :duration="500"/>
+          </b>
         </label>
-        <select @change="parseData" v-model="year" class="form-control" id="sel1">
+        <select @change="changeSelectHandler" v-model="year" class="form-control" id="sel1">
           <option v-for="y in yearsArr" :key="y" :value="y">{{y}}</option>
         </select>
       </div>
       <div class="col">
         <label for="sel2">
-          <b>Month: {{monthComp}}</b>
+          <b>Month:
+            <transition-group name="slide-fade" tag="span">
+              <span :key="1" v-if="animate_text_stage">{{monthComp}}</span>
+              <span :key="2" v-if="!animate_text_stage">{{monthComp}}</span>
+            </transition-group>
+          </b>
         </label>
-        <select @change="parseData" v-model="month" class="form-control" id="sel3">
+        <select @change="changeSelectHandler" v-model="month" class="form-control" id="sel3">
           <option v-for="(m,i) in months" :key="m" :value="i">{{m}}</option>
         </select>
       </div>
       <div class="col">
         <label for="sel3">
-          <b>Years back: {{back}} ({{year-back}})</b>
+          <b>
+            Years back:
+            <animated-number :value="back" :formatValue="e=>+e.toFixed(0)" :duration="500"/>
+            <animated-number :value="year-back" :formatValue="e=>' (' + +e.toFixed(0)" :duration="500"/>)
+          </b>
         </label>
-        <select @change="parseData" v-model="back" class="form-control" id="sel3">
+        <select @change="changeSelectHandler" v-model="back" class="form-control" id="sel3">
           <option
             v-for="(e,i) in new Array(5).fill(1)"
             :key="++i"
@@ -31,30 +42,32 @@
       </div>
       <div class="col">
         <label for="sel4">
-          <b>Detentions: {{dets}} {{dets?'or more':''}}</b>
+          <b>Detentions:
+            <animated-number :value="dets" :formatValue="e=>+e.toFixed(0)" :duration="500"/>
+            {{dets?'or more':''}}
+          </b>
         </label>
-        <select @change="parseData" v-model="dets" class="form-control" id="sel4">
+        <select @change="changeSelectHandler" v-model="dets" class="form-control" id="sel4">
           <option v-for="d in detsArr" :key="d">{{d}}</option>
         </select>
       </div>
-      <div class="col">
-		  
+      <div class="col middle">
         <button
           v-if="load==0"
           type="button"
-		  :class="{block_btn, btn_canceled}"
-          class="btn btn-warning "
+          :class="{block_btn, btn_canceled}"
+          class="btn btn-warning"
           @click="parseData"
         >
           <img v-if="isDevMode" src="../assets/google.gif">
           <img v-else :src="props_data.assets_path+'google.gif'">
-		  {{search_text}}
+          {{search_text}}
         </button>
-
+        
         <button
           v-else
           type="button"
-		  :class="block_btn"
+          :class="block_btn"
           class="btn btn-danger btn-cancel"
           @click="cancelHandler"
         >
@@ -63,6 +76,8 @@
           <img v-else :src="props_data.assets_path+'spinner.gif'">
           Cancel
         </button>
+
+        <b-form-checkbox-group v-model="selected" name="flavour1" :options="options" v-b-tooltip.html.bottom :title="`Automatic update of lists after changing search parameters`"></b-form-checkbox-group>
       </div>
     </div>
   </div>
@@ -76,23 +91,30 @@ export default {
       default: () => {
         return {
           api_url: "/api.php?",
-          assets_path: process.env.BASE_URL// "../assets/"
+          assets_path: process.env.BASE_URL // "../assets/"
         };
       }
     }
   },
   data() {
     return {
-      cancel_req_token: null,
+      selected: [], // Must be an array reference!
+      options: ["automatic"],
+
       dets: 2,
-	  load: 0,
-	  cancel_txt: 'Canceled!',
-	  search_text: 'Search',
-	  btn_canceled:'',
-	  block_btn: '',// .block_btn { /*css*/}
+      load: 0,
+      cancel_txt: "Canceled!",
+      search_text: "Search",
+      btn_text: "",
+      btn_canceled: "",
+      block_btn: "", // .block_btn { /*css*/}
       year: new Date().getFullYear(),
       month: new Date().getMonth() + 1,
-	  back: 1,
+      back: 1,
+
+      animate_text_stage: true,
+
+      cancel_req_token: null,
       months: [
         "January",
         "February",
@@ -110,32 +132,46 @@ export default {
     };
   },
   mounted() {
-	this.month = new Date().getMonth();
+    this.month = new Date().getMonth();
+    this.btn_text = this.search_text;
+  },
+  watch: {
+    month(neww, old) {
+      if (neww != old) this.animate_text_stage = !this.animate_text_stage;
+    },
+    selected(neww, old) {
+      if (neww.length) this.parseData();
+    }
   },
   methods: {
-	  cancelHandler(){
-		  this.cancel_req_token?this.cancel_req_token.cancel('Операция отменена пользователем'):'';
-		  this.cancel_req_token = null;
-	  },
-	changeBtnTextTemp(text) {
-		this.block_btn = 'block_btn';
-		let old = this.search_text;
-		if(old==text) return;
-		this.search_text = text;
-		 
-		setTimeout( () => {
-			this.search_text = old;
-			this.block_btn = '';
-			this.btn_canceled = '';
-		}, 1000);
-	},
+    changeSelectHandler() {
+      if (this.selected.includes(this.options[0])) this.parseData();
+    },
+    cancelHandler() {
+      this.cancel_req_token
+        ? this.cancel_req_token.cancel("Операция отменена пользователем")
+        : "";
+      this.cancel_req_token = null;
+    },
+    changeBtnTextTemp(text) {
+      this.block_btn = "block_btn";
+      let old = this.search_text;
+      if (old == text) return;
+      this.search_text = text;
+
+      setTimeout(() => {
+        this.search_text = old;
+        this.block_btn = "";
+        this.btn_canceled = "";
+      }, 1000);
+    },
     parseData: function() {
       this.load = 1;
       let axios = this.$http;
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
-	  this.cancel_req_token?this.cancel_req_token.cancel():'';
-	  this.cancel_req_token = source;
+      this.cancel_req_token ? this.cancel_req_token.cancel() : "";
+      this.cancel_req_token = source;
       let options = {
         cancelToken: source.token,
         params: {
@@ -168,26 +204,26 @@ export default {
             return map;
           }, {});
           this.$emit("response", { watch_list, under_perfomance });
-		  this.load = 0;
-		  this.changeBtnTextTemp('Success!');
+          this.load = 0;
+          this.changeBtnTextTemp("Success!");
         })
         .catch(e => {
           if (axios.isCancel(e)) {
-			console.log("[GET] => Request canceled", e, e.message);
-			this.btn_canceled = 'btn_canceled';
-			this.changeBtnTextTemp(this.cancel_txt);
+            console.log("[GET] => Request canceled", e, e.message);
+            this.btn_canceled = "btn_canceled";
+            this.changeBtnTextTemp(this.cancel_txt);
           } else {
-			console.warn("[GET] handle error ->", e);
-			this.changeBtnTextTemp('Error!');
+            console.warn("[GET] handle error ->", e);
+            this.changeBtnTextTemp("Error!");
           }
           this.load = 0;
         });
     }
   },
   computed: {
-	  isDevMode(){
-		  return process.env.NODE_ENV === 'development'
-	  },
+    isDevMode() {
+      return process.env.NODE_ENV === "development";
+    },
     yearsArr() {
       let d = new Date().getFullYear();
       // return new Array(13).fill(1).map((e, i) => (i == 0 ? "" : d--));//селект с пустой опцией
@@ -203,25 +239,49 @@ export default {
     }
   }
 };
-</script>
+</script> 
+<style>
+/* Анимации появления и исчезновения могут иметь */
+/* различные продолжительности и динамику.       */
+.slide-fade-enter-active {
+  /*transition: all 0.01s ease;*/
+}
+.slide-fade-leave-active {
+  /*transition: all 0.01s cubic-bezier(1, 0.5, 0.8, 1);*/
+}
+.slide-fade-enter, .slide-fade-leave-to
+/* .slide-fade-leave-active до версии 2.1.8 */ {
+  transform: translateX(10px);
+  opacity: 0;
+}
+</style>
  <style scoped>
+.middle {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  align-self: flex-end;
+}
 img {
   width: 18px;
   vertical-align: text-top;
 }
 .btn {
   width: 130px;
-  margin-top: 30px;
+  margin-top: 0px;
 }
-.btn-cancel { background: #4caf50; }
+
+.btn-cancel {
+  background: #4caf50;
+}
 
 .btn_canceled {
-	 background: darkred;
-	 color: white;
+  background: darkred;
+  color: white;
 }
 
 .block_btn {
-	pointer-events: none;
+  pointer-events: none;
 }
 </style>
  
