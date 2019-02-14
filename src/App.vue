@@ -7,9 +7,9 @@
       <br> <br>
     <Search :props_data="props_data" @response="responseHandler"/>
 
-    </b-jumbotron>
+    </b-jumbotron> 
 
-  
+
     <Result :responce="responce"/>
     <Footer/>
   </div>
@@ -52,10 +52,15 @@ body {
   margin-top: 0px;
   max-width: 2500px; 
 }
+
+.custom-checkbox, 
+.custom-checkbox *,
 button,select {
-  cursor: pointer;
-  transition: all 1s ease ;
+  cursor: pointer !important;
+  transition: all .3s ease ;
 }
+.custom-checkbox:hover, 
+.custom-checkbox *:hover,
 button:hover, select:hover {
   transform: scale(1.1)
 }
