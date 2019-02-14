@@ -14,6 +14,9 @@ import App from './App.vue';
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
+import AnimatedNumber from "animated-number-vue";
+Vue.component("animated-number", AnimatedNumber);
+
 window.initVue = arg => {
   document.title = 'title' in arg ? arg.title : document.title;
   new Vue({
