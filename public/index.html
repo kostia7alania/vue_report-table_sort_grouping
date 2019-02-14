@@ -17,18 +17,19 @@
   </noscript>
   <div id="app"></div>
   <!-- built files will be auto injected -->
-  <script>
-    
-   let a = setInterval( e => {
-      initVue({
-        api_url: "/swl_sup/api.php?",
-        title: 'Report',
-        title2: ' ',
-        assets_path: '../assets/'
-      });
-      clearInterval(a);
+  <script> 
+    let a = setInterval( e => {
+      if('initVue' in window) {
+        initVue({
+          api_url: "/swl_sup/api.php?",
+          title: 'Report',
+          title2: ' ',
+          assets_path: '../assets/'
+        });
+        clearInterval(a);
+      }
     }, 222);
- 
+
   </script> 
 </body>
 
