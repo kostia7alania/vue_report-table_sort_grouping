@@ -84,6 +84,13 @@
 </template>  
 
  <script>
+
+
+ import axios from 'axios';
+import { cacheAdapterEnhancer } from 'axios-extensions';
+
+
+
 export default {
   props: {
     props_data: {
@@ -105,7 +112,7 @@ export default {
       load: 0,
       cancel_txt: "Canceled!",
       search_text: "Search",
-      btn_text: "",
+      search_text_init: "Search", 
       btn_canceled: "",
       block_btn: "", // .block_btn { /*css*/}
       year: new Date().getFullYear(),
@@ -132,8 +139,28 @@ export default {
     };
   },
   mounted() {
-    this.month = new Date().getMonth();
-    this.btn_text = this.search_text;
+    this.month = new Date().getMonth(); 
+
+
+ 
+//axios.defaults.baseURL = process.env.BASE_URL;  
+//axios.defaults.headers.get['Accepts'] = 'application/json';
+//axios.defaults.headers.common['Access-Control-Allow-Origin'] = '*'; 
+//axios.defaults.headers.common['Access-Control-Allow-Headers'] = 'Origin, X-Requested-With, Content-Type, Accept';
+
+window.http = axios.create({
+    baseURL: '/',
+    //headers: { 'Cache-Control': 'no-cache' },
+    // cache will be enabled by default
+    adapter: cacheAdapterEnhancer(axios.defaults.adapter)
+});
+
+/*
+http.get('https://my-json-server.typicode.com/typicode/demo/posts?1'); // make real http request
+http.get('https://my-json-server.typicode.com/typicode/demo/posts?1'); // use the response from the cache of previous request, without real http request made
+http.get('https://my-json-server.typicode.com/typicode/demo/posts?1', { cache: false }); // disable cache manually and the the real http request invoked
+*/
+
   },
   watch: {
     month(neww, old) {
@@ -160,14 +187,16 @@ export default {
       this.search_text = text;
 
       setTimeout(() => {
-        this.search_text = old;
+        this.search_text = this.search_text_init;//old;
+        
         this.block_btn = "";
         this.btn_canceled = "";
       }, 1000);
     },
     parseData: function() {
       this.load = 1;
-      let axios = this.$http;
+      //let axios = this.$http;
+
       const CancelToken = axios.CancelToken;
       const source = CancelToken.source();
       this.cancel_req_token ? this.cancel_req_token.cancel() : "";
@@ -181,7 +210,7 @@ export default {
           dets: this.dets
         }
       };
-      axios
+      http
         .get(this.props_data.api_url, options)
         .then(res => {
           window.otv = res;
