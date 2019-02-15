@@ -1,11 +1,11 @@
 <template>
   <div id="results">
     <div class="container-fluid">
-      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click for ${watch_list_show?'hide':'show'} section`:'First you need to click on the Search button!'"
+      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click to ${watch_list_show?'hide':'show'} section`:'First you need to click on the Search button!'"
       @click="showTooltipHandler('watch_list_show')" 
       >
         SHIP WATCH LIST
-        <b-badge v-if="watch_list.length" variant="success" v-b-tooltip.hover title="Sum of rows in the table">
+        <b-badge v-if="watch_list.length" variant="success" v-b-tooltip.hover title="Number of records">
           <animated-number :value="watch_list.length" :formatValue="formatNum" :duration="500"/>
         </b-badge>
       </h1>
@@ -42,17 +42,17 @@
     </div>
 
     <div class="container-fluid"> 
-      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click for ${under_perfomance_show?'hide':'show'} section`:'First you need to click on the Search button!'"
+      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click to ${under_perfomance_show?'hide':'show'} section`:'First you need to click on the Search button!'"
       @click="showTooltipHandler('under_perfomance_show')">
       SHIP UNDER PERFORMANCE
-        <b-badge v-if="under_perfomance_count.b" variant="info" v-b-tooltip.hover title="Sum with unique IMO">
+        <b-badge v-if="under_perfomance_count.b" variant="info" v-b-tooltip.hover title="Number of ships">
           <animated-number
             :value="under_perfomance_count.b"
             :formatValue="formatNum"
             :duration="500"
           />
         </b-badge>
-        <b-badge v-if="under_perfomance_count.a" variant="success" v-b-tooltip.hover title="Sum of rows in the table">
+        <b-badge v-if="under_perfomance_count.a" variant="success" v-b-tooltip.hover title="Number of records">
           <animated-number
             :value="under_perfomance_count.a"
             :formatValue="formatNum"
@@ -117,7 +117,7 @@ export default {
   props: { responce: { type: Object } },
   data() {
     return {
-      orderBy: { key: "Det", sort: true }, // true = asc, false - descend
+      orderBy: { key: "Det", sort: false }, // true = asc, false - descend
       active: [],
       watch_list_show: true,
       under_perfomance_show: true,
