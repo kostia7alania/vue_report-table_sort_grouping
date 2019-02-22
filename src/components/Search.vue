@@ -214,17 +214,15 @@ http.get('https://my-json-server.typicode.com/typicode/demo/posts?1', { cache: f
         .get(this.props_data.api_url, options)
         .then(res => {
           window.otv = res;
-          let d = res.data.split("<breaker>");
-
-          let watch_list = JSON.parse(d[0]);
-
-          let otv1 = JSON.parse(
-            d[1].replace(/ISM DOC issuing RO/gim, "ISM_DOC_issuing_RO")
-          );
+          let d = res.data
+          if(typeof d == 'undefined' || !(d instanceof Object && Object.keys(d).includes('watch_list') && Object.keys(d).includes('perf_list'))) { // d = {watch:[{},{}],perf_list:[{},{}]}
+            this.btn_canceled = "btn_canceled";
+            throw ('Erorr');
+          }
 
           var k = "HUID"; // group by;
 
-          let under_perfomance = otv1.reduce((map, obj) => {
+          let under_perfomance = d.perf_list.reduce((map, obj) => {
             //if(!obj.selected) {    return map;  }
             let makeCode = (map[obj[k]] = map[obj[k]] || {}); // var modelCode = makeCode[obj.HUID] = makeCode[obj.HUID] || { count: 0 };
             let l = map[obj[k]];
@@ -232,9 +230,12 @@ http.get('https://my-json-server.typicode.com/typicode/demo/posts?1', { cache: f
             l[m] = { ...obj };
             return map;
           }, {});
-          this.$emit("response", { watch_list, under_perfomance });
+          
+          this.$emit("response", { watch_list: d.watch_list, under_perfomance });
           this.load = 0;
+          if ((typeof d.watch_list == 'object' && d.watch_list.length>0) || (typeof under_perfomance == 'object' && under_perfomance.length>0))
           this.changeBtnTextTemp("Success!");
+          else this.changeBtnTextTemp("No results");
         })
         .catch(e => {
           if (axios.isCancel(e)) {
@@ -243,7 +244,7 @@ http.get('https://my-json-server.typicode.com/typicode/demo/posts?1', { cache: f
             this.changeBtnTextTemp(this.cancel_txt);
           } else {
             console.warn("[GET] handle error ->", e);
-            this.changeBtnTextTemp("Error!");
+            this.changeBtnTextTemp("Error");
           }
           this.load = 0;
         });

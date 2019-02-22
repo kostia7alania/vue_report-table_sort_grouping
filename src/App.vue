@@ -5,7 +5,7 @@
   <div id="app2">
     <b-jumbotron bg-variant="default" text-variant="dark" border-variant="default" :header="props_data.title" :lead="props_data.title2">
       <br> <br>
-    <Search :props_data="props_data" @response="responseHandler"/>
+    <Search :props_data="props_data" @response="responce = $event"/>
 
     </b-jumbotron> 
 
@@ -27,12 +27,7 @@ export default {
     return { responce: {} }
   },
   components: { Search, Result, Footer },
-  methods: {
-    responseHandler() {
-      //console.log('==>>', arguments);
-      this.responce=arguments[0];
-    }
-  }
+  methods: {}
 };
 </script>
 
