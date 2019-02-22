@@ -1,7 +1,7 @@
 <template>
   <div id="results">
     <div class="container-fluid">
-      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click to ${watch_list_show?'hide':'show'} section`:'First you need to click on the Search button!'"
+      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click to ${watch_list_show?'hide':'show'} section`:first_acord_text"
       @click="showTooltipHandler('watch_list_show')" 
       >
         SHIP WATCH LIST
@@ -23,7 +23,7 @@
                   {{el}}
                   <template v-if="watch_list.length && el==orderBy.key.trim()">
                     <img class="arrows" v-if="orderBy.sort" src="../assets/down3.png">
-                    <img class="arrows" v-if="orderBy.sort == false" src="../assets/arrow_up.png">
+                    <img class="arrows" v-if="orderBy.sort === false" src="../assets/arrow_up.png">
                   </template>
                 </th>
               </tr>
@@ -42,7 +42,7 @@
     </div>
 
     <div class="container-fluid"> 
-      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click to ${under_perfomance_show?'hide':'show'} section`:'First you need to click on the Search button!'"
+      <h1 class="pointer" align="center" v-b-tooltip.hover :title=" searched ? `Click to ${under_perfomance_show?'hide':'show'} section`:first_acord_text"
       @click="showTooltipHandler('under_perfomance_show')">
       SHIP UNDER PERFORMANCE
         <b-badge v-if="under_perfomance_count.b" variant="info" v-b-tooltip.hover title="Number of ships">
@@ -123,7 +123,8 @@ export default {
       under_perfomance_show: true,
       searched: false,
       firstColumnCols: '#,Det,Name,IMO,Flag,CompanyName,CompanyIMO,ShipStatus'.split(','),
-      secondColumnCols: '#,IMO_No,Dets,Callsign,ShipName,InspDate,InspPlaceAndAuth,Company,ExternalID,ShipFlag,ISM DOC issuing RO'.split(',')
+      secondColumnCols: '#,IMO_No,Dets,Callsign,ShipName,InspDate,InspPlaceAndAuth,Company,ExternalID,ShipFlag,ISM DOC issuing RO'.split(','),
+      first_acord_text: 'Please, start your search by selecting the required parameters and clicking the button “Search”',
     };
   },
   methods: {
